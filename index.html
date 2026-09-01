@@ -36,18 +36,18 @@ label{display:block;font-size:12px;font-weight:800;color:var(--muted);margin:9px
 <div id="modal" class="modal"><div id="sheet" class="sheet"></div></div><div id="toast" class="toast"></div>
 <script type="module">
 /*
- DOMINO FILTRADO V2
- Para activar la nube, llena FIREBASE_CONFIG con los datos de tu proyecto Firebase.
- Mientras esté vacío, la app funciona en modo local para pruebas.
+ DOMINO FILTRADO V2 · FIRESTORE
+ Configuración Firebase integrada.
+ Los datos se guardan localmente y también en Firestore, colección "partidas",
+ documento "estado-general".
 */
 const FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyCaer4qa6VTnaxk1rHvCXIrjPvSIrNaRnY",
+  authDomain: "domino-filtrado.firebaseapp.com",
+  projectId: "domino-filtrado",
+  storageBucket: "domino-filtrado.firebasestorage.app",
+  messagingSenderId: "237732246672",
+  appId: "1:237732246672:web:f62c24ca39765cbcb8d415"
 };
 
 const LOCAL_KEY='dominoFiltrado_v2';
@@ -87,17 +87,36 @@ async function persist(){db.updatedAt=Date.now();localStorage.setItem(LOCAL_KEY,
 function render(){document.getElementById('roleBadge').textContent=isAdmin()?'ADMIN':'CONSULTA';renderHome();renderGame();renderHistory();renderPlayers()}
 async function saveRender(){await persist();render()}
 
-function cloudConfigured(){return FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.databaseURL&&FIREBASE_CONFIG.projectId}
+function cloudConfigured(){return FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.projectId}
 async function initCloud(){if(!cloudConfigured()){render();return}try{
- const [{initializeApp},{getDatabase,ref,set,onValue,get},{getAuth,signInAnonymously}]=await Promise.all([
+ const [{initializeApp},{getFirestore,doc,setDoc,getDoc,onSnapshot}]=await Promise.all([
   import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js'),
-  import('https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js'),
-  import('https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js')
+  import('https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js')
  ]);
- const app=initializeApp(FIREBASE_CONFIG);const auth=getAuth(app);await signInAnonymously(auth);const r=ref(getDatabase(app),'dominoFiltrado/main');
- cloud={set:(x)=>set(r,x)};const snap=await get(r);if(snap.exists()){db={...clone(seed),...snap.val()};localStorage.setItem(LOCAL_KEY,JSON.stringify(db))}else{await set(r,db)}
- onValue(r,s=>{if(!s.exists()||syncing)return;db={...clone(seed),...s.val()};localStorage.setItem(LOCAL_KEY,JSON.stringify(db));render()});cloudReady=true;render();
- }catch(e){console.error(e);render();toast('Nube no disponible; modo local')}
+ const app=initializeApp(FIREBASE_CONFIG);
+ const fs=getFirestore(app);
+ const r=doc(fs,'partidas','estado-general');
+ cloud={set:(x)=>setDoc(r,x)};
+ const snap=await getDoc(r);
+ if(snap.exists()){
+   db={...clone(seed),...snap.data()};
+   localStorage.setItem(LOCAL_KEY,JSON.stringify(db));
+ }else{
+   await setDoc(r,db);
+ }
+ onSnapshot(r,s=>{
+   if(!s.exists()||syncing)return;
+   db={...clone(seed),...s.data()};
+   localStorage.setItem(LOCAL_KEY,JSON.stringify(db));
+   render();
+ });
+ cloudReady=true;
+ render();
+ }catch(e){
+   console.error(e);
+   render();
+   toast('Nube no disponible; modo local');
+ }
 }
 
 function cloudBanner(){return cloudConfigured()?`<div class="notice">☁️ Datos compartidos: ${cloudReady?'conectado':'conectando…'}</div>`:`<div class="notice cloud-off">📱 Modo de prueba local. Falta conectar la base compartida.</div>`}
