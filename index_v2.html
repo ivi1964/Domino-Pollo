@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#111827" />
+<title>DOMINO FILTRADO</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--accent:#111827;--soft:#eef2f7;--ok:#0f766e;--bad:#b91c1c;--warn:#9a3412;--radius:18px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+header{position:sticky;top:0;z-index:20;background:#111827;color:#fff;padding:14px 16px 12px;box-shadow:0 2px 10px rgba(0,0,0,.14)}
+.head{max-width:820px;margin:auto;display:flex;align-items:center;gap:12px}.tile{width:42px;height:42px;border:2px solid #fff;border-radius:9px;display:grid;place-items:center;font-size:24px;transform:rotate(8deg)}
+h1{font-size:20px;margin:0;letter-spacing:.7px}.sub{font-size:12px;opacity:.75;margin-top:3px}.role{margin-left:auto;font-size:11px;font-weight:900;background:rgba(255,255,255,.13);padding:7px 9px;border-radius:999px}
+main{max-width:820px;margin:auto;padding:14px 14px 96px}.view{display:none}.view.active{display:block}.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:13px;box-shadow:0 2px 8px rgba(17,24,39,.04)}
+.card h2,.card h3{margin:0 0 10px}.card h2{font-size:20px}.card h3{font-size:16px}.muted{color:var(--muted)}.tiny{font-size:11px;color:var(--muted)}
+.btn{border:0;border-radius:13px;padding:13px 15px;font-size:15px;font-weight:800;cursor:pointer}.btn.primary{background:var(--accent);color:#fff}.btn.secondary{background:var(--soft);color:var(--text)}.btn.danger{background:#fee2e2;color:var(--bad)}.btn:disabled{opacity:.4}.full{width:100%}
+.row{display:flex;gap:9px;align-items:center}.grow{flex:1}.space{justify-content:space-between}.wrap{flex-wrap:wrap}
+label{display:block;font-size:12px;font-weight:800;color:var(--muted);margin:9px 0 5px;text-transform:uppercase;letter-spacing:.4px}input,select{width:100%;padding:12px 11px;border:1px solid #d1d5db;border-radius:12px;background:#fff;font-size:16px;color:var(--text)}
+.tabs{position:fixed;bottom:0;left:0;right:0;z-index:25;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:7px 7px calc(7px + env(safe-area-inset-bottom));box-shadow:0 -3px 15px rgba(0,0,0,.08)}.tab{border:0;background:transparent;padding:7px 2px;color:var(--muted);font-weight:700;font-size:11px}.tab.active{color:var(--text)}.tab span{display:block;font-size:21px;margin-bottom:2px}
+.stat{display:grid;grid-template-columns:1fr auto;gap:7px;padding:8px 0;border-bottom:1px solid var(--line)}.friendly{background:#fff7ed;border:1px solid #fed7aa;color:var(--warn);border-radius:13px;padding:10px 12px;font-weight:800;font-size:13px;margin:10px 0}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.team{padding:13px;border-radius:16px;background:#f9fafb;border:1px solid var(--line)}.team-title{font-size:13px;font-weight:900;letter-spacing:.7px;margin-bottom:8px}
+.score-sheet{overflow:hidden;border:2px solid #111827;border-radius:16px;background:#fff;margin-top:12px}.score-head{display:grid;grid-template-columns:1fr 1fr;background:#111827;color:#fff;font-weight:900;text-align:center}.score-head>div{padding:10px 4px}.score-head>div+div{border-left:2px solid #fff}.subhead,.score-row{display:grid;grid-template-columns:repeat(4,1fr);text-align:center}.subhead{background:#eef2f7;font-size:11px;font-weight:900;color:#4b5563}.subhead div,.score-row div{padding:8px 3px;border-right:1px solid var(--line)}.subhead div:nth-child(2),.score-row div:nth-child(2){border-right:2px solid #111827}.subhead div:last-child,.score-row div:last-child{border-right:0}.score-row{font-size:20px;font-weight:850;border-top:1px solid var(--line)}.score-row .total{font-weight:950}.score-row:last-child{background:#fafafa}
+.entry{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.entry-box{border:1px solid var(--line);border-radius:14px;padding:10px}.entry-box h4{margin:0 0 8px;font-size:13px;text-align:center}.entry-actions{display:flex;gap:8px;margin-top:10px}
+.player{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 0;border-bottom:1px solid var(--line)}.initial{width:38px;height:38px;background:#111827;color:#fff;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:12px}.pname{font-weight:800}.pmeta{font-size:12px;color:var(--muted)}.official{background:#ecfdf5;color:#065f46;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900}.guest{background:#fff7ed;color:#9a3412;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900}
+.game-line{padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}.game-head{display:flex;justify-content:space-between;font-weight:800;gap:8px}.ray{font-size:12px;margin-top:4px;color:var(--muted)}
+.notice{padding:10px 12px;border-radius:12px;background:#eff6ff;color:#1e40af;font-size:12px;font-weight:800;margin-bottom:12px}.cloud-off{background:#fef2f2;color:#991b1b}.modal{position:fixed;inset:0;background:rgba(0,0,0,.46);z-index:50;display:none;align-items:flex-end;justify-content:center}.modal.show{display:flex}.sheet{background:#fff;width:100%;max-width:820px;border-radius:24px 24px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}.toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:#111827;color:#fff;padding:11px 16px;border-radius:999px;font-weight:800;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:60}.toast.show{opacity:1}
+@media(min-width:700px){.tabs{left:50%;transform:translateX(-50%);max-width:820px;border:1px solid var(--line);border-radius:18px 18px 0 0}.sheet{border-radius:24px;margin-bottom:20px}}
+</style>
+</head>
+<body>
+<header><div class="head"><div class="tile">⚄</div><div><h1>DOMINO FILTRADO</h1><div class="sub">Anotador y campeonato</div></div><div id="roleBadge" class="role">CONSULTA</div></div></header>
+<main>
+<section id="view-home" class="view active"></section><section id="view-game" class="view"></section><section id="view-history" class="view"></section><section id="view-players" class="view"></section>
+</main>
+<nav class="tabs"><button class="tab active" data-view="home"><span>⌂</span>Noche</button><button class="tab" data-view="game"><span>⚄</span>Partida</button><button class="tab" data-view="history"><span>▦</span>Historial</button><button class="tab" data-view="players"><span>♟</span>Jugadores</button></nav>
+<div id="modal" class="modal"><div id="sheet" class="sheet"></div></div><div id="toast" class="toast"></div>
+<script type="module">
+/*
+ DOMINO FILTRADO V2
+ Para activar la nube, llena FIREBASE_CONFIG con los datos de tu proyecto Firebase.
+ Mientras esté vacío, la app funciona en modo local para pruebas.
+*/
+const FIREBASE_CONFIG = {
+  apiKey: "",
+  authDomain: "",
+  databaseURL: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+
+const LOCAL_KEY='dominoFiltrado_v2';
+const SESSION_KEY='dominoFiltrado_role_v2';
+const seed={
+ players:[
+  {id:'tm',name:'Toño Márquez',initials:'TM',type:'official',active:true},
+  {id:'ao',name:'Alejandro Ortega',initials:'AO',type:'official',active:true},
+  {id:'d',name:'David Gómez Junco',initials:'D',type:'official',active:true},
+  {id:'g',name:'Gila',initials:'G',type:'official',active:true},
+  {id:'p',name:'Alejandro Gómez Junco (Pollo)',initials:'P',type:'official',active:true}
+ ], nights:[], currentNight:null, currentGame:null, updatedAt:Date.now()
+};
+let db=loadLocal();
+let cloud=null, cloudReady=false, syncing=false;
+let role=sessionStorage.getItem(SESSION_KEY)||'viewer';
+
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function loadLocal(){try{return {...clone(seed),...JSON.parse(localStorage.getItem(LOCAL_KEY)||'{}')}}catch{return clone(seed)}}
+function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36)}
+function todayISO(){return new Date().toISOString().slice(0,10)}
+function fmtDate(s){return s?new Date(s+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'}):''}
+function player(id){return db.players.find(p=>p.id===id)}
+function initials(id){return player(id)?.initials||'?'}
+function name(id){return player(id)?.name||'Jugador'}
+function esc(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function isAdmin(){return role==='admin'}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function currentNight(){return db.currentNight?db.nights.find(n=>n.id===db.currentNight):null}
+function friendlyIds(ids){return ids.some(id=>player(id)?.type==='guest')}
+function activePlayers(){return db.players.filter(p=>p.active)}
+function raysForLoser(loserScore){return loserScore===0?3:loserScore<50?2:1}
+function nightTotals(n){const out={};db.players.filter(p=>p.type==='official').forEach(p=>out[p.id]=0);(n.games||[]).forEach(g=>{if(g.friendly)return;Object.entries(g.rays||{}).forEach(([id,v])=>out[id]=(out[id]||0)+v)});return out}
+function allTotals(){const out={};db.players.filter(p=>p.type==='official').forEach(p=>out[p.id]=0);db.nights.filter(n=>n.closed).forEach(n=>{const t=nightTotals(n);Object.entries(t).forEach(([id,v])=>out[id]=(out[id]||0)+v)});return out}
+
+async function persist(){db.updatedAt=Date.now();localStorage.setItem(LOCAL_KEY,JSON.stringify(db));if(cloudReady&&cloud&&!syncing){try{syncing=true;await cloud.set(db)}catch(e){console.error(e);toast('Sin conexión: guardado local')}finally{syncing=false}}}
+function render(){document.getElementById('roleBadge').textContent=isAdmin()?'ADMIN':'CONSULTA';renderHome();renderGame();renderHistory();renderPlayers()}
+async function saveRender(){await persist();render()}
+
+function cloudConfigured(){return FIREBASE_CONFIG.apiKey&&FIREBASE_CONFIG.databaseURL&&FIREBASE_CONFIG.projectId}
+async function initCloud(){if(!cloudConfigured()){render();return}try{
+ const [{initializeApp},{getDatabase,ref,set,onValue,get},{getAuth,signInAnonymously}]=await Promise.all([
+  import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js'),
+  import('https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js'),
+  import('https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js')
+ ]);
+ const app=initializeApp(FIREBASE_CONFIG);const auth=getAuth(app);await signInAnonymously(auth);const r=ref(getDatabase(app),'dominoFiltrado/main');
+ cloud={set:(x)=>set(r,x)};const snap=await get(r);if(snap.exists()){db={...clone(seed),...snap.val()};localStorage.setItem(LOCAL_KEY,JSON.stringify(db))}else{await set(r,db)}
+ onValue(r,s=>{if(!s.exists()||syncing)return;db={...clone(seed),...s.val()};localStorage.setItem(LOCAL_KEY,JSON.stringify(db));render()});cloudReady=true;render();
+ }catch(e){console.error(e);render();toast('Nube no disponible; modo local')}
+}
+
+function cloudBanner(){return cloudConfigured()?`<div class="notice">☁️ Datos compartidos: ${cloudReady?'conectado':'conectando…'}</div>`:`<div class="notice cloud-off">📱 Modo de prueba local. Falta conectar la base compartida.</div>`}
+function adminGate(){if(isAdmin())return true;openAdminLogin();return false}
+function openAdminLogin(){document.getElementById('sheet').innerHTML=`<h2>Acceso administrador</h2><p class="muted">Solo David y El Pollo deben usar este acceso.</p><label>Clave</label><input id="adminPin" type="password" inputmode="numeric" maxlength="8" placeholder="Clave"><div style="height:12px"></div><button class="btn primary full" id="loginBtn">Entrar</button><div style="height:8px"></div><button class="btn secondary full" id="closeBtn">Cancelar</button>`;document.getElementById('modal').classList.add('show');document.getElementById('loginBtn').onclick=loginAdmin;document.getElementById('closeBtn').onclick=closeModal}
+async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+// Cambia este hash al configurar las claves definitivas. Temporalmente acepta 2580 para la prueba.
+const ADMIN_PIN_HASH='ed946f65d2c785d90e827c5ffd879ce3b49c68d4c88013074176a7e73bc58bcf';
+async function loginAdmin(){const pin=document.getElementById('adminPin').value;const h=await sha256(pin);if(h!==ADMIN_PIN_HASH){alert('Clave incorrecta.');return}role='admin';sessionStorage.setItem(SESSION_KEY,role);closeModal();render();toast('Modo administrador')}
+function logoutAdmin(){role='viewer';sessionStorage.removeItem(SESSION_KEY);render();toast('Modo consulta')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+
+function renderHome(){const el=document.getElementById('view-home'),n=currentNight();if(!n){el.innerHTML=cloudBanner()+`<div class="card"><div class="row space"><div><h2>Nueva noche de dominó</h2><p class="muted">Abre una jornada para registrar partidas y rayas.</p></div>${isAdmin()?'<button class="btn secondary" id="logout">Salir admin</button>':'<button class="btn secondary" id="admin">Admin</button>'}</div><label>Fecha</label><input id="nightDate" type="date" value="${todayISO()}" ${isAdmin()?'':'disabled'}><div style="height:10px"></div><button class="btn primary full" id="startNight" ${isAdmin()?'':'disabled'}>▶ Iniciar noche</button></div><div class="card"><h3>Reglas automáticas</h3><div class="stat"><span>Perdedor termina en 0</span><b>3 rayas</b></div><div class="stat"><span>Perdedor termina de 1 a 49</span><b>2 rayas</b></div><div class="stat"><span>Perdedor termina con 50 o más</span><b>1 raya</b></div><div class="friendly">Si participa un invitado, la partida es amistosa y no suma ni resta rayas.</div></div>`;document.getElementById('startNight').onclick=startNight;(document.getElementById('admin')||document.getElementById('logout')).onclick=isAdmin()?logoutAdmin:openAdminLogin;return}
+ const totals=nightTotals(n);const officials=db.players.filter(p=>p.type==='official'&&p.active);el.innerHTML=cloudBanner()+`<div class="card"><div class="row space"><div><div class="tiny">NOCHE ABIERTA</div><h2>${fmtDate(n.date)}</h2></div><button class="btn danger" id="closeNight" ${isAdmin()?'':'disabled'}>Cerrar noche</button></div>${officials.map(p=>`<div class="stat"><span>${esc(p.name)}</span><b>${totals[p.id]||0}</b></div>`).join('')}</div>`;document.getElementById('closeNight').onclick=closeNight}
+async function startNight(){if(!adminGate())return;const d=document.getElementById('nightDate').value;if(!d)return;const n={id:uid(),date:d,games:[],closed:false,createdAt:Date.now()};db.nights.push(n);db.currentNight=n.id;await saveRender();goView('game')}
+async function closeNight(){if(!adminGate())return;const n=currentNight();if(!n)return;if(db.currentGame){alert('Termina o cancela la partida en curso.');return}if(!confirm('¿Cerrar la noche y pasarla al historial?'))return;n.closed=true;n.closedAt=Date.now();db.currentNight=null;await saveRender();goView('history')}
+
+function renderGame(){const el=document.getElementById('view-game'),n=currentNight();if(!n){el.innerHTML=`<div class="card"><div class="muted">Primero inicia una noche desde Noche.</div></div>`;return}if(!db.currentGame){const opts='<option value="">Selecciona…</option>'+activePlayers().map(p=>`<option value="${p.id}">${esc(p.initials)} · ${esc(p.name)}${p.type==='guest'?' (Invitado)':''}</option>`).join('');el.innerHTML=`<div class="card"><h2>Configurar partida</h2><p class="muted">Selecciona las dos parejas.</p><div class="team-grid"><div class="team"><div class="team-title">ELLOS</div><select id="th1" ${isAdmin()?'':'disabled'}>${opts}</select><div style="height:7px"></div><select id="th2" ${isAdmin()?'':'disabled'}>${opts}</select></div><div class="team"><div class="team-title">NOSOTROS</div><select id="us1" ${isAdmin()?'':'disabled'}>${opts}</select><div style="height:7px"></div><select id="us2" ${isAdmin()?'':'disabled'}>${opts}</select></div></div><div id="guestNotice"></div><div style="height:12px"></div><button class="btn primary full" id="beginGame" ${isAdmin()?'':'disabled'}>⚄ Iniciar partida</button></div>`;['th1','th2','us1','us2'].forEach(id=>document.getElementById(id).onchange=previewFriendly);document.getElementById('beginGame').onclick=beginGame;return}
+ const g=db.currentGame;const rows=(g.hands||[]).map(h=>`<div class="score-row"><div>${h.themPoints}</div><div class="total">${h.themTotal}</div><div>${h.usPoints}</div><div class="total">${h.usTotal}</div></div>`).join('')||`<div class="score-row"><div>0</div><div class="total">0</div><div>0</div><div class="total">0</div></div>`;
+ el.innerHTML=`<div class="card"><div class="row space"><div><div class="tiny">PARTIDA EN CURSO</div><h2>Marcador a 100</h2></div><button class="btn danger" id="cancelGame" ${isAdmin()?'':'disabled'}>Cancelar</button></div>${g.friendly?'<div class="friendly">PARTIDA AMISTOSA · Hay invitado en mesa.</div>':''}<div class="score-sheet"><div class="score-head"><div>ELLOS<br><span class="tiny" style="color:#d1d5db">${g.teams.them.map(initials).join(' + ')}</span></div><div>NOSOTROS<br><span class="tiny" style="color:#d1d5db">${g.teams.us.map(initials).join(' + ')}</span></div></div><div class="subhead"><div>Jugada</div><div>Total</div><div>Jugada</div><div>Total</div></div>${rows}</div><div class="entry"><div class="entry-box"><h4>ELLOS · puntos de esta jugada</h4><input id="ptsThem" type="number" min="0" inputmode="numeric" placeholder="0" ${isAdmin()?'':'disabled'}></div><div class="entry-box"><h4>NOSOTROS · puntos de esta jugada</h4><input id="ptsUs" type="number" min="0" inputmode="numeric" placeholder="0" ${isAdmin()?'':'disabled'}></div></div><div class="entry-actions"><button class="btn primary grow" id="registerHand" ${isAdmin()?'':'disabled'}>Registrar jugada</button><button class="btn secondary" id="undoHand" ${(isAdmin()&&(g.hands||[]).length)?'':'disabled'}>↶ Deshacer</button></div></div>`;document.getElementById('registerHand').onclick=registerHand;document.getElementById('undoHand').onclick=undoHand;document.getElementById('cancelGame').onclick=cancelGame}
+function previewFriendly(){const ids=['th1','th2','us1','us2'].map(id=>document.getElementById(id).value).filter(Boolean);document.getElementById('guestNotice').innerHTML=friendlyIds(ids)?'<div class="friendly">Hay invitado: esta partida será amistosa.</div>':''}
+async function beginGame(){if(!adminGate())return;const them=['th1','th2'].map(id=>document.getElementById(id).value),us=['us1','us2'].map(id=>document.getElementById(id).value),ids=[...them,...us];if(ids.some(x=>!x)){alert('Selecciona los cuatro jugadores.');return}if(new Set(ids).size!==4){alert('No se puede repetir jugador.');return}db.currentGame={id:uid(),teams:{them,us},hands:[],score:{them:0,us:0},friendly:friendlyIds(ids),startedAt:Date.now()};await saveRender()}
+async function registerHand(){if(!adminGate())return;const g=db.currentGame;let them=Number(document.getElementById('ptsThem').value||0),us=Number(document.getElementById('ptsUs').value||0);if(them<0||us<0||(!them&&!us)){alert('Escribe los puntos obtenidos en esta jugada.');return}if(them>0&&us>0&&!confirm('Capturaste puntos para ambos lados. ¿Es correcto?'))return;const themTotal=g.score.them+them,usTotal=g.score.us+us;g.hands.push({themPoints:them,themTotal,usPoints:us,usTotal});g.score={them:themTotal,us:usTotal};await persist();render();if(themTotal>=100||usTotal>=100)finishGamePrompt()}
+async function undoHand(){if(!adminGate())return;const g=db.currentGame;if(!g?.hands?.length)return;g.hands.pop();const last=g.hands[g.hands.length-1];g.score=last?{them:last.themTotal,us:last.usTotal}:{them:0,us:0};await saveRender()}
+async function cancelGame(){if(!adminGate())return;if(confirm('¿Cancelar esta partida?')){db.currentGame=null;await saveRender()}}
+function finishGamePrompt(){const g=db.currentGame;if(!g)return;const winner=g.score.them>=100?'ELLOS':'NOSOTROS';document.getElementById('sheet').innerHTML=`<h2>${winner} llegaron a ${Math.max(g.score.them,g.score.us)}</h2><p class="muted">Marcador: Ellos ${g.score.them} · Nosotros ${g.score.us}</p><button class="btn primary full" id="finishBtn">Terminar partida y calcular rayas</button><div style="height:8px"></div><button class="btn secondary full" id="continueBtn">Seguir capturando</button>`;document.getElementById('modal').classList.add('show');document.getElementById('finishBtn').onclick=finishGame;document.getElementById('continueBtn').onclick=closeModal}
+async function finishGame(){if(!adminGate())return;const g=db.currentGame,n=currentNight();if(!g||!n)return;const themWon=g.score.them>=100&&g.score.them>=g.score.us;const losingScore=themWon?g.score.us:g.score.them;const rv=g.friendly?0:raysForLoser(losingScore);const rays={};if(!g.friendly){const winners=themWon?g.teams.them:g.teams.us,losers=themWon?g.teams.us:g.teams.them;winners.forEach(id=>rays[id]=(rays[id]||0)+rv);losers.forEach(id=>rays[id]=(rays[id]||0)-rv)}n.games.push({...g,rayValue:rv,rays,endedAt:Date.now()});db.currentGame=null;closeModal();await saveRender();toast(g.friendly?'Partida amistosa guardada':`${rv} raya${rv===1?'':'s'} registradas`)}
+
+function gameLine(g){const a=g.teams.them.map(initials).join('+'),b=g.teams.us.map(initials).join('+');const tag=g.friendly?'Amistosa':`${g.rayValue} raya${g.rayValue!==1?'s':''}`;return `<div class="game-line"><div class="game-head"><span>${a} vs ${b}</span><span>${g.score.them}–${g.score.us}</span></div><div class="ray">${tag}</div></div>`}
+function renderHistory(){const el=document.getElementById('view-history'),closed=db.nights.filter(n=>n.closed).slice().reverse(),totals=allTotals();const ranking=db.players.filter(p=>p.type==='official').map(p=>({p,v:totals[p.id]||0})).sort((a,b)=>b.v-a.v);el.innerHTML=`<div class="card"><h2>Campeonato</h2>${ranking.map((x,i)=>`<div class="stat"><span>${i+1}. ${esc(x.p.name)}</span><b>${x.v>0?'+':''}${x.v}</b></div>`).join('')}</div><div class="card"><h2>Historial</h2>${closed.length?closed.map(n=>`<div style="padding:10px 0;border-bottom:1px solid var(--line)"><b>${fmtDate(n.date)}</b>${(n.games||[]).map(gameLine).join('')||'<div class="muted">Sin partidas</div>'}</div>`).join(''):'<div class="muted">Todavía no hay noches cerradas.</div>'}</div>`}
+function renderPlayers(){const el=document.getElementById('view-players');el.innerHTML=`<div class="card"><div class="row space"><div><h2>Jugadores</h2><p class="muted" style="margin:2px 0 0">Oficiales e invitados.</p></div><button class="btn primary" id="addPlayer" ${isAdmin()?'':'disabled'}>＋ Agregar</button></div>${db.players.map(p=>`<div class="player"><div class="row grow"><div class="initial">${esc(p.initials)}</div><div><div class="pname">${esc(p.name)}</div><div class="pmeta"><span class="${p.type==='guest'?'guest':'official'}">${p.type==='guest'?'INVITADO':'OFICIAL'}</span>${p.active?'':' · Inactivo'}</div></div></div><button class="btn secondary editPlayer" data-id="${p.id}" ${isAdmin()?'':'disabled'}>Editar</button></div>`).join('')}</div>`;document.getElementById('addPlayer').onclick=()=>openPlayerModal();document.querySelectorAll('.editPlayer').forEach(b=>b.onclick=()=>openPlayerModal(b.dataset.id))}
+function openPlayerModal(id=null){if(!adminGate())return;const p=id?player(id):null;document.getElementById('sheet').innerHTML=`<h2>${p?'Editar jugador':'Nuevo jugador'}</h2><label>Nombre</label><input id="pName" value="${p?esc(p.name):''}"><label>Iniciales</label><input id="pInit" maxlength="4" value="${p?esc(p.initials):''}"><label>Tipo</label><select id="pType"><option value="official" ${(p?.type||'official')==='official'?'selected':''}>Jugador oficial</option><option value="guest" ${p?.type==='guest'?'selected':''}>Jugador invitado</option></select><label>Estado</label><select id="pActive"><option value="1" ${p?.active!==false?'selected':''}>Activo</option><option value="0" ${p?.active===false?'selected':''}>Inactivo</option></select><div style="height:12px"></div><button class="btn primary full" id="savePlayer">Guardar</button><div style="height:8px"></div><button class="btn secondary full" id="cancelPlayer">Cancelar</button>`;document.getElementById('modal').classList.add('show');document.getElementById('savePlayer').onclick=()=>savePlayer(id);document.getElementById('cancelPlayer').onclick=closeModal}
+async function savePlayer(id){const nm=document.getElementById('pName').value.trim(),it=document.getElementById('pInit').value.trim().toUpperCase(),type=document.getElementById('pType').value,active=document.getElementById('pActive').value==='1';if(!nm||!it){alert('Escribe nombre e iniciales.');return}if(id){Object.assign(player(id),{name:nm,initials:it,type,active})}else db.players.push({id:uid(),name:nm,initials:it,type,active});closeModal();await saveRender()}
+
+function goView(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById('view-'+v).classList.add('active');document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.view===v));window.scrollTo(0,0)}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>goView(b.dataset.view));document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
+initCloud();
+</script>
+</body></html>
